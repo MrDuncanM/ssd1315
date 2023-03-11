@@ -31,7 +31,7 @@ void ssd1315_img_clear(SSD1315_IMG *img) {
 }
 
 int8_t ssd1315_img_set(SSD1315_IMG *img, uint8_t pixelX, uint8_t pixelY, uint8_t isOn) {
-    if (pixelX > img->colsX || pixelY > (img->pagesY << 4)) {
+    if (pixelX >= img->colsX || pixelY >= (img->pagesY << 3)) {
         return -1; // OUT OF RANGE
     }
 
@@ -42,13 +42,18 @@ int8_t ssd1315_img_set(SSD1315_IMG *img, uint8_t pixelX, uint8_t pixelY, uint8_t
         ++col;
     }
     uint16_t offset = (col * 128) + pixelX + 1; // the +1 is to account for the control byte
-    img->buffer[offset] |= (0x1 << pixelY);
+    if (isOn) {
+        img->buffer[offset] |= (0x1 << pixelY);
+    }
+    else {
+        img->buffer[offset] &= ~(0x1 << pixelY);
+    }
 
     return 0;
 }
 
 int8_t ssd1315_img_get(SSD1315_IMG *img, uint8_t pixelX, uint8_t pixelY) {
-    if (pixelX > img->colsX || pixelY > (img->pagesY << 4)) {
+    if (pixelX >= img->colsX || pixelY >= (img->pagesY << 3)) {
         return -1; // OUT OF RANGE
     }
 
@@ -63,7 +68,7 @@ int8_t ssd1315_img_get(SSD1315_IMG *img, uint8_t pixelX, uint8_t pixelY) {
 }
 
 int8_t ssd1315_img_draw(SSD1315_IMG *img, uint8_t pixelX, uint8_t pageY) {
-    if (pixelX > 128 || pageY > 7) {
+    if (pixelX > 127 || pageY > 7) {
         return -1;
     }
 
