@@ -59,7 +59,7 @@ int8_t ssd1315_img_get(SSD1315_IMG *img, uint8_t pixelX, uint8_t pixelY) {
         ++col;
     }
     uint16_t offset = (col * 128) + pixelX + 1; // the +1 is to account for the control byte
-    return img->buffer[offset] &= (0x1 << pixelY);
+    return (img->buffer[offset] &= (0x1 << pixelY)) != 0;
 }
 
 int8_t ssd1315_img_draw(SSD1315_IMG *img, uint8_t pixelX, uint8_t pageY) {
